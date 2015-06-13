@@ -1,41 +1,17 @@
-;Try.asm
 .386P
-; плоская модель
 .MODEL FLAT, stdcall
 option casemap :none
 ;------------------------------------------------------------
-include c:\masm32\projects\Examples\TryMasm\src\include\Try.inc
-include c:\masm32\include\windows.inc
-; подключения библиотек
-includelib c:\masm32\lib\user32.lib
-includelib c:\masm32\lib\kernel32.lib
-includelib c:\masm32\lib\gdi32.lib
+include ..\..\..\include\windows.inc
+include ..\..\..\include\user32.inc
+include ..\..\..\include\kernel32.inc
+include ..\..\..\include\gdi32.inc
+includelib ..\..\..\lib\user32.lib
+includelib ..\..\..\lib\kernel32.lib
+includelib ..\..\..\lib\gdi32.lib
 
 dwStyle equ 000CF0000H
 dwExStyle equ 4003h
-
-SetTextColor PROTO :dword, :dword
-EndPaint PROTO :dword, :dword
-DispatchMessageA PROTO :dword
-TranslateMessage PROTO :dword
-GetMessageA PROTO :dword, :dword, :dword, :dword
-CreateWindowExA PROTO :dword, :dword, :dword, :dword, :dword, :dword, :dword, :dword, :dword, :dword, :dword, :dword
-GetLastError PROTO
-CreateSolidBrush PROTO :dword
-LoadCursorA PROTO :dword, :dword
-LoadIconA PROTO :dword, :dword
-RegisterClassA PROTO :dword
-ExitProcess PROTO :dword
-GetModuleHandleA PROTO :dword
-ShowWindow PROTO :dword, :dword
-UpdateWindow PROTO :dword
-PostQuitMessage PROTO :dword
-BeginPaint PROTO :dword, :dword
-SetBkColor PROTO :dword, :dword
-DefWindowProcA PROTO :dword, :dword, :dword, :dword
-TextOutA PROTO :dword, :dword, :dword, :dword, :dword
-Try PROTO :dword, :dword, :dword, :dword
-MessageBoxA PROTO :dword, :dword, :dword, :dword
 
 .data
 	lpText db 'Hello, world!', 0
@@ -112,8 +88,6 @@ invoke DefWindowProcA, hwnd, mes, lParam, wParam
 
 ret
 Try endp
-
-
 
 end start
 	
