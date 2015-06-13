@@ -4,7 +4,7 @@
 .MODEL FLAT, stdcall
 option casemap :none
 ;------------------------------------------------------------
-include c:\masm32\projects\Examples\TryMasm\include\Try.inc
+include c:\masm32\projects\Examples\TryMasm\src\include\Try.inc
 include c:\masm32\include\windows.inc
 ; подключения библиотек
 includelib c:\masm32\lib\user32.lib
