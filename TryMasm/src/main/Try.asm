@@ -68,7 +68,7 @@ mov [wc.hIcon], eax
 invoke LoadCursorA, 0, IDC_CROSS
 mov [wc.hCursor], eax
 
-invoke CreateSolidBrush, RGBW
+invoke CreateSolidBrush, Red
 mov [wc.hbrBackground], eax
 
 mov dword ptr [wc.lpszMenuName], 0

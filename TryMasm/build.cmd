@@ -1,10 +1,9 @@
 @echo off
 
-ml /c /coff c:\masm32\projects\Examples\TryMasm\src\main\Try.asm || goto ErrLable
-move c:\masm32\projects\Examples\TryMasm\Try.obj c:\masm32\projects\Examples\TryMasm\src\object || goto ErrLable
-link /subsystem:windows c:\masm32\projects\Examples\TryMasm\src\object\Try.obj || goto ErrLable
-move c:\masm32\projects\Examples\TryMasm\Try.exe c:\masm32\projects\Examples\TryMasm\exe || goto ErrLable
-help
+ml /c /coff c:\masm32\projects\Examples\TryMasm\src\main\Try.asm || goto ErrLable || goto ErrLable
+link /subsystem:windows Try.obj || goto ErrLable
+del Try.obj
+del Try.exe
 goto end
 :ErrLable
 echo Error
