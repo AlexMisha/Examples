@@ -54,13 +54,12 @@ invoke RegisterClassA, offset wc
 invoke CreateWindowExA, dwExStyle, offset lpClassName, offset lpWindowName, wc.style, 100, 100, 500, 200, 0, 0, hInstance, 0
 
 .if eax == 0
-jmp Err
+jmp Finish
 .endif
 
 mov hWindow, eax
 invoke ShowWindow, hWindow, SW_SHOWNORMAL
 invoke UpdateWindow, hWindow
-invoke MessageBoxA, hWindow, offset sMessage, offset lpTitle, 0
 
 MesLoop:
 invoke GetMessageA, offset Msg, 0, 0, 0
@@ -73,9 +72,6 @@ jmp MesLoop
 
 Finish:
 invoke ExitProcess, [Msg.wParam]
-
-Err:
-jmp Finish
 
 MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
