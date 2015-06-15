@@ -1,9 +1,9 @@
 @echo off
 
-ml /c /coff src\main\Try.asm || goto ErrLable || goto ErrLable
-link /subsystem:windows Try.obj || goto ErrLable
-del Try.obj
-del Try.exe
+ml /c /coff src\main\MasmTry.asm || goto ErrLable || goto ErrLable
+link /subsystem:windows MasmTry.obj || goto ErrLable
+del MasmTry.obj
+del MasmTry.exe
 goto end
 :ErrLable
 echo Error

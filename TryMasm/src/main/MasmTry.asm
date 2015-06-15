@@ -2,13 +2,13 @@
 .MODEL FLAT, stdcall
 option casemap :none
 ;------------------------------------------------------------
-include ..\..\..\include\windows.inc
-include ..\..\..\include\user32.inc
-include ..\..\..\include\kernel32.inc
-include ..\..\..\include\gdi32.inc
-includelib ..\..\..\lib\user32.lib
-includelib ..\..\..\lib\kernel32.lib
-includelib ..\..\..\lib\gdi32.lib
+include \masm32\include\windows.inc
+include \masm32\include\user32.inc
+include \masm32\include\kernel32.inc
+include \masm32\include\gdi32.inc
+includelib \masm32\lib\user32.lib
+includelib \masm32\lib\kernel32.lib
+includelib \masm32\lib\gdi32.lib
 
 dwStyle equ 000CF0000H
 dwExStyle equ 4003h
@@ -33,7 +33,7 @@ invoke GetModuleHandleA, 0
 mov hInstance, eax
 
 mov [wc.style], dwStyle
-mov [wc.lpfnWndProc], offset Try
+mov [wc.lpfnWndProc], offset MasmTry
 mov [wc.cbClsExtra], 0
 mov [wc.cbWndExtra], 0
 mov eax, hInstance
@@ -77,7 +77,7 @@ invoke ExitProcess, [Msg.wParam]
 Err:
 jmp Finish
 
-Try proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
+MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
 .if mes == WM_DESTROY
 invoke PostQuitMessage, 0
@@ -87,7 +87,7 @@ invoke DefWindowProcA, hwnd, mes, lParam, wParam
 .endif
 
 ret
-Try endp
+MasmTry endp
 
 end start
 	
