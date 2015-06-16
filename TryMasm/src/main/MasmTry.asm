@@ -32,7 +32,7 @@ start:
 invoke GetModuleHandleA, 0
 mov hInstance, eax
 
-mov [wc.style], dwStyle
+mov [wc.style], dwExStyle
 mov [wc.lpfnWndProc], offset MasmTry
 mov [wc.cbClsExtra], 0
 mov [wc.cbWndExtra], 0
@@ -44,14 +44,15 @@ mov [wc.hIcon], eax
 invoke LoadCursorA, 0, IDC_CROSS
 mov [wc.hCursor], eax
 
-invoke CreateSolidBrush, Red
+invoke CreateSolidBrush, COLOR_DESKTOP
 mov [wc.hbrBackground], eax
 
 mov dword ptr [wc.lpszMenuName], 0
 mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
-invoke CreateWindowExA, dwExStyle, offset lpClassName, offset lpWindowName, wc.style, 100, 100, 500, 200, 0, 0, hInstance, 0
+invoke GetLastError
+invoke CreateWindowExA, dwExStyle, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
 
 .if eax == 0
 jmp Finish
