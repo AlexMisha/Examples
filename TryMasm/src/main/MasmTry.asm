@@ -17,17 +17,17 @@ ErrLib PROTO
 
 .data
 	lpText db 'Hello, world!', 0
-	wc WNDCLASSA <?>
 	lpClassName db 'Class32', 0
 	lpWindowName db 'Try', 0
-	hInstance dword 0
-	hWindow dword 0
-	Msg MSG <?>
-	Paint PAINTSTRUCT <?>
 	sMessage db 'Hello, world!', 0
 	lpTitle db 'Message', 0
+	hInstance dword 0
+	hWindow dword 0
 	YT dword 30
 	XT dword 30
+	wc WNDCLASSA <?>
+	Paint PAINTSTRUCT <?>
+	Msg MSG <?>
 .code
 start:
 
