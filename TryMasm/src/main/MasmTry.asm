@@ -11,12 +11,14 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
 
 dwStyle equ 000CF0000H
-dwExStyle equ 4003h
+Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
+
+ErrLib PROTO 
 
 .data
 	lpText db 'Hello, world!', 0
 	wc WNDCLASSA <?>
-	lpClassName db 'Message', 0
+	lpClassName db 'Class32', 0
 	lpWindowName db 'Try', 0
 	hInstance dword 0
 	hWindow dword 0
@@ -32,7 +34,7 @@ start:
 invoke GetModuleHandleA, 0
 mov hInstance, eax
 
-mov [wc.style], dwExStyle
+mov [wc.style], Style
 mov [wc.lpfnWndProc], offset MasmTry
 mov [wc.cbClsExtra], 0
 mov [wc.cbWndExtra], 0
@@ -51,8 +53,11 @@ mov dword ptr [wc.lpszMenuName], 0
 mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
-invoke GetLastError
-invoke CreateWindowExA, dwExStyle, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
+invoke ErrLib
+.if eax == 0
+jmp Finish
+.endif
+invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
 
 .if eax == 0
 jmp Finish
@@ -73,6 +78,15 @@ jmp MesLoop
 
 Finish:
 invoke ExitProcess, [Msg.wParam]
+
+;Error code in ebx
+ErrLib proc 
+push eax
+invoke GetLastError
+mov ebx, eax
+pop eax
+ret
+ErrLib endp
 
 MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
