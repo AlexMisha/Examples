@@ -9,10 +9,13 @@ include \masm32\include\gdi32.inc
 includelib \masm32\lib\user32.lib
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
+includelib dw2a.lib
 
+debug equ 0
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
-
+ 
+dw2a PROTO :dword, :dword
 ErrLib PROTO 
 
 .data
@@ -21,6 +24,8 @@ ErrLib PROTO
 	lpWindowName db 'Try', 0
 	sMessage db 'Hello, world!', 0
 	lpTitle db 'Message', 0
+	fMtStrinG db "%lu",0
+	lpBuffer db 255
 	hInstance dword 0
 	hWindow dword 0
 	YT dword 30
@@ -43,7 +48,7 @@ mov [wc.hInstance], eax
 invoke LoadIconA, 0, IDI_APPLICATION
 mov [wc.hIcon], eax
 
-invoke LoadCursorA, 0, IDC_CROSS
+invoke LoadCursorA, 0, IDC_ARROW
 mov [wc.hCursor], eax
 
 invoke CreateSolidBrush, COLOR_DESKTOP
@@ -53,7 +58,6 @@ mov dword ptr [wc.lpszMenuName], 0
 mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
-invoke ErrLib
 .if eax == 0
 jmp Finish
 .endif
