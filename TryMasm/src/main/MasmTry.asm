@@ -1,4 +1,4 @@
-.386P
+.686P
 .MODEL FLAT, stdcall
 option casemap :none
 ;------------------------------------------------------------
@@ -6,26 +6,22 @@ include \masm32\include\windows.inc
 include \masm32\include\user32.inc
 include \masm32\include\kernel32.inc
 include \masm32\include\gdi32.inc
+include \masm32\macros\macros.asm
 includelib \masm32\lib\user32.lib
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
-includelib dw2a.lib
 
 debug equ 0
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
  
-dw2a PROTO :dword, :dword
+log_message PROTO :dword
 ErrLib PROTO 
 
 .data
-	lpText db 'Hello, world!', 0
+	sString db 'Error code:', 0
 	lpClassName db 'Class32', 0
 	lpWindowName db 'Try', 0
-	sMessage db 'Hello, world!', 0
-	lpTitle db 'Message', 0
-	fMtStrinG db "%lu",0
-	lpBuffer db 255
 	hInstance dword 0
 	hWindow dword 0
 	YT dword 30
@@ -58,6 +54,7 @@ mov dword ptr [wc.lpszMenuName], 0
 mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
+invoke log_message, offset sString
 .if eax == 0
 jmp Finish
 .endif
@@ -70,7 +67,7 @@ jmp Finish
 mov hWindow, eax
 invoke ShowWindow, hWindow, SW_SHOWNORMAL
 invoke UpdateWindow, hWindow
-
+invoke log_message, offset lpClassName
 MesLoop:
 invoke GetMessageA, offset Msg, 0, 0, 0
 .if eax == 0
@@ -82,6 +79,16 @@ jmp MesLoop
 
 Finish:
 invoke ExitProcess, [Msg.wParam]
+
+log_message proc msg:dword
+local buffer[256]:byte
+
+invoke GetLastError
+invoke wsprintfA, addr buffer, chr$("%s[%08X]"), msg, eax
+invoke OutputDebugString, addr buffer
+
+ret
+log_message endp
 
 ;Error code in ebx
 ErrLib proc 
