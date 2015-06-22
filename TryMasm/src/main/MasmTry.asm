@@ -67,7 +67,6 @@ jmp Finish
 mov hWindow, eax
 invoke ShowWindow, hWindow, SW_SHOWNORMAL
 invoke UpdateWindow, hWindow
-invoke log_message, offset lpClassName
 MesLoop:
 invoke GetMessageA, offset Msg, 0, 0, 0
 .if eax == 0
@@ -85,7 +84,7 @@ local buffer[256]:byte
 
 invoke GetLastError
 invoke wsprintfA, addr buffer, chr$("%s[%08X]"), msg, eax
-invoke OutputDebugString, addr buffer
+invoke MessageBoxA, hWindow, addr buffer, msg, MB_OK
 
 ret
 log_message endp
