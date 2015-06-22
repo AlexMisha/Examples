@@ -54,8 +54,8 @@ mov dword ptr [wc.lpszMenuName], 0
 mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
-invoke log_message, offset sString
 .if eax == 0
+invoke log_message, offset sString
 jmp Finish
 .endif
 invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
