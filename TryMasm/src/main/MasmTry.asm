@@ -10,13 +10,11 @@ include \masm32\macros\macros.asm
 includelib \masm32\lib\user32.lib
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
-
 debug equ 0
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
  
 log_message PROTO :dword
-ErrLib PROTO 
 
 .data
 	sString db 'Error code:', 0
@@ -84,19 +82,10 @@ local buffer[256]:byte
 
 invoke GetLastError
 invoke wsprintfA, addr buffer, chr$("%s[%08X]"), msg, eax
-invoke MessageBoxA, hWindow, addr buffer, msg, MB_OK
+invoke OutputDebugString, addr buffer
 
 ret
 log_message endp
-
-;Error code in ebx
-ErrLib proc 
-push eax
-invoke GetLastError
-mov ebx, eax
-pop eax
-ret
-ErrLib endp
 
 MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
