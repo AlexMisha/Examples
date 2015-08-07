@@ -7,14 +7,12 @@ include \masm32\include\user32.inc
 include \masm32\include\kernel32.inc
 include \masm32\include\gdi32.inc
 include \masm32\macros\macros.asm
+include \masm32\projects\Examples\TryMasm\src\include\Log.inc
 includelib \masm32\lib\user32.lib
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
-debug equ 0
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
- 
-log_message PROTO :dword
 
 .data
 	sString db 'Error code:', 0
@@ -53,7 +51,6 @@ mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
 .if eax == 0
-invoke log_message, offset sString
 jmp Finish
 .endif
 invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
@@ -76,16 +73,6 @@ jmp MesLoop
 
 Finish:
 invoke ExitProcess, [Msg.wParam]
-
-log_message proc msg:dword
-local buffer[256]:byte
-
-invoke GetLastError
-invoke wsprintfA, addr buffer, chr$("%s[%08X]"), msg, eax
-invoke OutputDebugString, addr buffer
-
-ret
-log_message endp
 
 MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
