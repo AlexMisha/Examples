@@ -15,7 +15,7 @@ dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 
 .data
-	sString db 'Error code:', 0
+	FmtString db '%s[%08X]', 0
 	lpClassName db 'Class32', 0
 	lpWindowName db 'Try', 0
 	hInstance dword 0
@@ -25,6 +25,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	wc WNDCLASSA <?>
 	Paint PAINTSTRUCT <?>
 	Msg MSG <?>
+	RegisterClassA_Err db 'RegisterClassA_Error', 0
+	CreateWindowExA_Err db 'CreateWindowExA_Error', 0
 .code
 start:
 
@@ -51,11 +53,14 @@ mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
 .if eax == 0
+invoke GetLastError
+LOG_ERROR "%s[%08X]", addr RegisterClassA_Err, eax
 jmp Finish
 .endif
 invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
 
 .if eax == 0
+invoke GetLastError
 jmp Finish
 .endif
 

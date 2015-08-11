@@ -44,13 +44,15 @@ ENDM
 
 LOG_ERROR macro FmtString, args:vararg
 if LOG_LEVEL ge ERROR_LEVEL
+LOCAL buffer4, SymbString4
 .data
  SymbString4 db "ERROR: "
  db FmtString, 0
- buffer4 db 255 dup(?)
+ buffer4 db 255 
 .code
 invoke wsprintfA, addr buffer4, addr SymbString4, args
 invoke OutputDebugString, addr buffer4
+EXITM buffer4, SymbString4
 endif
 ENDM
 
