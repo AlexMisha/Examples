@@ -24,23 +24,6 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	wc WNDCLASSA <?>
 	Paint PAINTSTRUCT <?>
 	Msg MSG <?>
-	CreateWindowExA_Err db 'CreateWindowExA_Error', 0
-	CreateWindowExA_SCS db 'CreateWindowExA_Success',0
-	GetModuleHandleA_Err db 'GetModuleHandleA_Error', 0
-	GetModuleHandleA_SCS db 'GetModuleHandleA_Success',0
-	LoadIconA_Err db 'LoadIconA_Error',0
-	LoadIconA_SCS db 'LoadIconA_Success',0
-	LoadCursorA_Err db 'LoadCursorA_Error',0
-	LoadCursorA_SCS db 'LoadCursorA_Success',0
-	CreateSolidBrush_Err db 'CreateSolidBrush_Error',0
-	CreateSolidBrush_SCS db 'CreateSolidBrush_Success',0
-	RegisterClassA_Err db 'RegisterClassA_Error', 0
-	RegisterClassA_SCS db 'RegisterClassA_Success',0
-	UpdateWindow_Err db 'UpdateWindow_Error', 0
-	UpdateWindow_SCS db 'UpdateWindow_Success',0
-	QuitMessage db 'QuitMessagee had got',0
-	GetMessageA_Err db 'GetMessageA_Error',0
-	MessageGot db 'Another Message had got',0
 .code
 start:
 
@@ -49,10 +32,10 @@ mov hInstance, eax
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr GetModuleHandleA_Err, eax
+LOG_ERROR "GetModuleHandleA error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr GetModuleHandleA_SCS
+LOG_INFO "GetModuleHandleA success, eax[%08X]", eax
 .endif
 
 mov [wc.style], Style
@@ -66,10 +49,10 @@ mov [wc.hIcon], eax
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr LoadIconA_Err, eax
+LOG_ERROR "LoadIconA error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr LoadIconA_SCS
+LOG_INFO "LoadIconA success, eax[%08X]", eax
 .endif
 
 invoke LoadCursorA, 0, IDC_ARROW
@@ -77,10 +60,10 @@ mov [wc.hCursor], eax
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr LoadCursorA_Err, eax
+LOG_ERROR "LoadCursorA error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr LoadCursorA_SCS
+LOG_INFO "LoadCursorA success, eax[%08X]", eax
 .endif
 
 invoke CreateSolidBrush, COLOR_DESKTOP
@@ -88,10 +71,10 @@ mov [wc.hbrBackground], eax
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr CreateSolidBrush_Err, eax
+LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr CreateSolidBrush_SCS
+LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
 .endif
 
 mov dword ptr [wc.lpszMenuName], 0
@@ -101,10 +84,10 @@ invoke RegisterClassA, offset wc
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr RegisterClassA_Err, eax
+LOG_ERROR "RegisterClassA error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr RegisterClassA_SCS
+LOG_INFO "RegisterClassA success, eax[%08X]", eax
 .endif
 
 invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 500, 200, 0, 0, hInstance, 0
@@ -112,10 +95,10 @@ mov hWindow, eax
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr CreateWindowExA_Err, eax
+LOG_ERROR "CreateWindowExA error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr CreateWindowExA_SCS
+LOG_INFO "CreateWindowExA success, eax[%08X]", eax
 .endif
 
 invoke ShowWindow, hWindow, SW_SHOWNORMAL
@@ -123,23 +106,23 @@ invoke UpdateWindow, hWindow
 
 .if eax == 0
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr UpdateWindow_Err, eax
+LOG_ERROR "UpdateWindow error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr UpdateWindow_SCS
+LOG_INFO "UpdateWindow success, eax[%08X]", eax
 .endif
 
 MesLoop:
 invoke GetMessageA, offset Msg, 0, 0, 0
 .if eax == 0
-LOG_INFO "%s", addr QuitMessage
+LOG_INFO "GetMessageA quit message:[%08X]", eax
 jmp Finish
 .elseif eax == -1
 invoke GetLastError
-LOG_ERROR "%s[%08X]", addr GetMessageA_Err, eax
+LOG_ERROR "GetMessageA error code:[%08X]", eax
 jmp Finish
 .else
-LOG_INFO "%s", addr MessageGot
+LOG_INFO "GetMessageA another message had got:[%08X]", eax
 .endif
 invoke TranslateMessage, offset Msg
 invoke DispatchMessageA, offset Msg
