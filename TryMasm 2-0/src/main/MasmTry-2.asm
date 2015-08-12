@@ -13,7 +13,7 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
-
+RGBT equ 255
 .data
 	lpClassName db 'Class32', 0
 	lpWindowName db 'MasmTry-2', 0
@@ -22,6 +22,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	wc WNDCLASSA <?>
 	Paint PAINTSTRUCT <?>
 	Msg MSG <?>
+	hPaint dword 0
+	sPaintOutString db 'Hello, world!',0
 .code
 start:
 
@@ -127,6 +129,53 @@ MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
 .if mes == WM_DESTROY
 invoke PostQuitMessage, 0
+mov eax, 0
+.elseif mes == WM_PAINT
+invoke BeginPaint, hwnd, offset Paint
+mov hPaint, eax
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "BeginPaint error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "BeginPaint success, eax[%08X]", eax
+	.endif
+
+invoke SetBkColor, addr hPaint, White	
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "SetBkColor error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "SetBkColor success, eax[%08X]", eax
+	.endif
+
+invoke SetTextColor, addr hPaint, Black
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "SetTextColor error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "SetTextColor success, eax[%08X]", eax
+	.endif
+	
+invoke TextOutA, hPaint, 50, 50, offset sPaintOutString, lengthof sPaintOutString
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "TextOutA error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "TextOutA success, eax[%08X]", eax
+	.endif
+	
+invoke EndPaint, hwnd, offset Paint
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "EndPaint error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "EndPaint success, eax[%08X]", eax
+	.endif
 mov eax, 0
 .else
 invoke DefWindowProcA, hwnd, mes, lParam, wParam
