@@ -13,17 +13,21 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
-RGBT equ 255
+STYLBTN equ WS_CHILD + BS_DEFPUSHBUTTON + WS_VISIBLE + WS_TABSTOP
 .data
 	lpClassName db 'Class32', 0
 	lpWindowName db 'MasmTry-2', 0
+	lpButtonName db 'Button',0
+	lpButtonClassName db 'Button',0
 	hInstance dword 0
+	hButtonInstance dword 0
 	hWindow dword 0
 	wc WNDCLASSA <?>
 	Paint PAINTSTRUCT <?>
 	Msg MSG <?>
 	hPaint dword 0
-	sPaintOutString db 'Hello, world!',0
+	sInfoExitString db 'Right click for exit',0
+	sInfoMessageString db 'Left click for message',0
 .code
 start:
 
@@ -159,7 +163,16 @@ invoke SetTextColor, addr hPaint, Black
 	LOG_INFO "SetTextColor success, eax[%08X]", eax
 	.endif
 	
-invoke TextOutA, hPaint, 50, 50, offset sPaintOutString, lengthof sPaintOutString
+invoke TextOutA, hPaint, 50, 50, offset sInfoExitString, lengthof sInfoExitString
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "TextOutA error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "TextOutA success, eax[%08X]", eax
+	.endif
+	
+invoke TextOutA, hPaint, 50, 100, offset sInfoMessageString, lengthof sInfoMessageString
 	.if eax == 0
 	invoke GetLastError
 	LOG_ERROR "TextOutA error code:[%08X]", eax
@@ -177,6 +190,28 @@ invoke EndPaint, hwnd, offset Paint
 	LOG_INFO "EndPaint success, eax[%08X]", eax
 	.endif
 mov eax, 0
+.elseif mes == WM_CREATE
+invoke CreateWindowExA, 0, offset lpButtonClassName, offset lpButtonName, STYLBTN, 450, 100, 180, 50, hwnd, 0, hInstance, 0
+mov hButtonInstance, eax
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+	.endif
+mov eax, 0
+.elseif mes == WM_RBUTTONDOWN
+jmp Finish
+.elseif mes == WM_LBUTTONDOWN
+invoke MessageBoxA, hwnd, offset sInfoExitString, offset lpWindowName, 0
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "MessageBoxA error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "MessageBoxA success, eax[%08X]", eax
+	.endif
 .else
 invoke DefWindowProcA, hwnd, mes, lParam, wParam
 .endif
