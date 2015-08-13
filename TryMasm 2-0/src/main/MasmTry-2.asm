@@ -38,8 +38,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 .code
 start:
 
-invoke GetModuleHandleA, 0
-mov hInstance, eax
+	invoke GetModuleHandleA, 0
+	mov hInstance, eax
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "GetModuleHandleA error code:[%08X]", eax
@@ -48,15 +48,15 @@ mov hInstance, eax
 		LOG_INFO "GetModuleHandleA success, eax[%08X]", eax
 	.endif
 
-mov [wc.style], Style
-mov [wc.lpfnWndProc], offset MasmTry
-mov [wc.cbClsExtra], 0
-mov [wc.cbWndExtra], 0
-mov eax, hInstance
-mov [wc.hInstance], eax
+	mov [wc.style], Style
+	mov [wc.lpfnWndProc], offset MasmTry
+	mov [wc.cbClsExtra], 0
+	mov [wc.cbWndExtra], 0
+	mov eax, hInstance
+	mov [wc.hInstance], eax
 
-invoke LoadIconA, hInstance, 1
-mov [wc.hIcon], eax
+	invoke LoadIconA, hInstance, 1
+	mov [wc.hIcon], eax
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "LoadIconA error code:[%08X]", eax
@@ -65,8 +65,8 @@ mov [wc.hIcon], eax
 		LOG_INFO "LoadIconA success, eax[%08X]", eax
 	.endif	
 	
-invoke LoadCursorA, 0, IDC_ARROW
-mov [wc.hCursor], eax
+	invoke LoadCursorA, 0, IDC_ARROW
+	mov [wc.hCursor], eax
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "LoadCursorA error code:[%08X]", eax
@@ -75,8 +75,8 @@ mov [wc.hCursor], eax
 		LOG_INFO "LoadCursorA success, eax[%08X]", eax
 	.endif
 
-invoke CreateSolidBrush, White
-mov [wc.hbrBackground], eax
+	invoke CreateSolidBrush, White
+	mov [wc.hbrBackground], eax
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
@@ -85,10 +85,10 @@ mov [wc.hbrBackground], eax
 		LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
 	.endif
 	
-mov dword ptr [wc.lpszMenuName], 0
-mov dword ptr [wc.lpszClassName], offset lpClassName
+	mov dword ptr [wc.lpszMenuName], 0
+	mov dword ptr [wc.lpszClassName], offset lpClassName
 
-invoke RegisterClassA, offset wc
+	invoke RegisterClassA, offset wc
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "RegisterClassA error code:[%08X]", eax
@@ -97,8 +97,8 @@ invoke RegisterClassA, offset wc
 		LOG_INFO "RegisterClassA success, eax[%08X]", eax
 	.endif
 	
-invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 650, 400, 0, 0, hInstance, 0
-mov hWindow, eax
+	invoke CreateWindowExA, Style, offset lpClassName, offset lpWindowName, dwStyle, 100, 100, 650, 400, 0, 0, hInstance, 0
+	mov hWindow, eax
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "CreateWindowExA error code:[%08X]", eax
@@ -107,8 +107,8 @@ mov hWindow, eax
 		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
 	.endif
 	
-invoke ShowWindow, hWindow, SW_SHOWNORMAL
-invoke UpdateWindow, hWindow
+	invoke ShowWindow, hWindow, SW_SHOWNORMAL
+	invoke UpdateWindow, hWindow
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "UpdateWindow error code:[%08X]", eax
@@ -118,7 +118,7 @@ invoke UpdateWindow, hWindow
 	.endif
 	
 MesLoop:
-invoke GetMessageA, offset Msg, 0, 0, 0
+	invoke GetMessageA, offset Msg, 0, 0, 0
 	.if eax == 0
 		LOG_INFO "GetMessageA quit message:[%08X]", eax
 		jmp Finish
@@ -129,12 +129,12 @@ invoke GetMessageA, offset Msg, 0, 0, 0
 	.else
 		LOG_INFO "GetMessageA another message had got:[%08X]", eax
 	.endif
-invoke TranslateMessage, offset Msg
-invoke DispatchMessageA, offset Msg
+	invoke TranslateMessage, offset Msg
+	invoke DispatchMessageA, offset Msg
 jmp MesLoop
 	
 Finish:
-invoke ExitProcess, 0
+	invoke ExitProcess, 0
 
 MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 
