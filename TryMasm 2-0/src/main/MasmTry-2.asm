@@ -17,16 +17,20 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 .data
 	lpClassName db 'Class32', 0
 	lpWindowName db 'MasmTry-2', 0
-	lpButtonName db 'Button',0
-	lpButtonClassName db 'Button',0
 	Butn1 db 'Exit', 0
+	Butn2 db 'Message', 0
+	Butn3 db 'Paint',0
 	hInstance dword 0
-	hButtonInstance dword 0
+	hButn1 dword 0
+	hButn2 dword 0
+	hButn3 dword 0
 	hWindow dword 0
+	hBrush dword 0
 	wc WNDCLASSA <?>
 	Paint PAINTSTRUCT <?>
 	Msg MSG <?>
 	hPaint dword 0
+	sMessage db 'Message',0
 	sInfoExitString db 'Right click for exit',0
 	sInfoMessageString db 'Left click for message',0
 .code
@@ -49,7 +53,7 @@ mov [wc.cbWndExtra], 0
 mov eax, hInstance
 mov [wc.hInstance], eax
 
-invoke LoadIconA, 0, IDI_APPLICATION
+invoke LoadIconA, hInstance, 1
 mov [wc.hIcon], eax
 	.if eax == 0
 	invoke GetLastError
@@ -190,10 +194,31 @@ invoke EndPaint, hwnd, offset Paint
 	.else
 	LOG_INFO "EndPaint success, eax[%08X]", eax
 	.endif
+	
 mov eax, 0
 .elseif mes == WM_CREATE
 PushButton addr Butn1, hwnd, 500, 300, 100, 25
-mov hButtonInstance, eax
+mov hButn1, eax
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+	.endif
+
+PushButton addr Butn2, hwnd, 500, 50, 100, 25
+mov hButn2, eax
+	.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+	jmp Finish
+	.else
+	LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+	.endif
+	
+PushButton addr Butn3, hwnd, 500, 100, 100, 25
+mov hButn3, eax
 	.if eax == 0
 	invoke GetLastError
 	LOG_ERROR "CreateWindowExA error code:[%08X]", eax
@@ -207,7 +232,7 @@ mov eax, 0
 invoke PostQuitMessage, 0
 mov eax, 0
 .elseif mes == WM_LBUTTONDOWN
-invoke MessageBoxA, hwnd, offset sInfoExitString, offset lpWindowName, 0
+invoke MessageBoxA, hwnd, offset sInfoExitString, offset lpWindowName,0
 	.if eax == 0
 	invoke GetLastError
 	LOG_ERROR "MessageBoxA error code:[%08X]", eax
@@ -216,9 +241,71 @@ invoke MessageBoxA, hwnd, offset sInfoExitString, offset lpWindowName, 0
 	LOG_INFO "MessageBoxA success, eax[%08X]", eax
 	.endif
 .elseif mes == WM_COMMAND
-mov eax, hButtonInstance
+mov eax, hButn1
 	.if wParam == eax
 	invoke PostQuitMessage, 0
+	.endif
+xor eax, eax
+mov eax, hButn2
+	.if wParam == eax
+	invoke MessageBox, hwnd, offset sMessage, offset sMessage, 0
+		.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "MessageBoxA error code:[%08X]", eax
+		jmp Finish
+		.else
+		LOG_INFO "MessageBoxA success, eax[%08X]", eax
+		.endif
+	.endif
+xor eax,eax
+mov eax, hButn3
+	.if wParam == eax
+	invoke CreateSolidBrush, Black
+	mov hBrush, eax
+		.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
+		jmp Finish
+		.else
+		LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
+		.endif 
+		
+	invoke BeginPaint, hwnd, offset Paint
+	mov hPaint, eax
+		.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "BeginPaint error code:[%08X]", eax
+		jmp Finish
+		.else
+		LOG_INFO "BeginPaint success, eax[%08X]", eax
+		.endif 
+		
+	invoke SelectObject, hPaint, hBrush
+		.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "SelectObject error code:[%08X]", eax
+		jmp Finish
+		.else
+		LOG_INFO "SelectObject success, eax[%08X]", eax
+		.endif 	
+		
+	invoke Ellipse, hPaint, 100, 100, 200, 150
+		.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "Ellipse error code:[%08X]", eax
+		jmp Finish
+		.else
+		LOG_INFO "Ellipse success, eax[%08X]", eax
+		.endif	
+	
+	invoke EndPaint, hwnd, offset Paint
+		.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "EndPaint error code:[%08X]", eax
+		jmp Finish
+		.else
+		LOG_INFO "EndPaint success, eax[%08X]", eax
+		.endif
 	.endif
 mov eax, 0
 .else
