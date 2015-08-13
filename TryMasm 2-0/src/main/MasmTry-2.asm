@@ -11,14 +11,15 @@ include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 includelib \masm32\lib\user32.lib
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
+include \masm32\projects\Examples\TryMasm 2-0\src\include\PushButton.inc
 dwStyle equ 000CF0000H
 Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
-STYLBTN equ WS_CHILD + BS_DEFPUSHBUTTON + WS_VISIBLE + WS_TABSTOP
 .data
 	lpClassName db 'Class32', 0
 	lpWindowName db 'MasmTry-2', 0
 	lpButtonName db 'Button',0
 	lpButtonClassName db 'Button',0
+	Butn1 db 'Exit', 0
 	hInstance dword 0
 	hButtonInstance dword 0
 	hWindow dword 0
@@ -191,7 +192,7 @@ invoke EndPaint, hwnd, offset Paint
 	.endif
 mov eax, 0
 .elseif mes == WM_CREATE
-invoke CreateWindowExA, 0, offset lpButtonClassName, offset lpButtonName, STYLBTN, 450, 100, 180, 50, hwnd, 0, hInstance, 0
+PushButton addr Butn1, hwnd, 500, 300, 100, 25
 mov hButtonInstance, eax
 	.if eax == 0
 	invoke GetLastError
@@ -200,9 +201,11 @@ mov hButtonInstance, eax
 	.else
 	LOG_INFO "CreateWindowExA success, eax[%08X]", eax
 	.endif
+	
 mov eax, 0
 .elseif mes == WM_RBUTTONDOWN
-jmp Finish
+invoke PostQuitMessage, 0
+mov eax, 0
 .elseif mes == WM_LBUTTONDOWN
 invoke MessageBoxA, hwnd, offset sInfoExitString, offset lpWindowName, 0
 	.if eax == 0
@@ -212,6 +215,12 @@ invoke MessageBoxA, hwnd, offset sInfoExitString, offset lpWindowName, 0
 	.else
 	LOG_INFO "MessageBoxA success, eax[%08X]", eax
 	.endif
+.elseif mes == WM_COMMAND
+mov eax, hButtonInstance
+	.if wParam == eax
+	invoke PostQuitMessage, 0
+	.endif
+mov eax, 0
 .else
 invoke DefWindowProcA, hwnd, mes, lParam, wParam
 .endif
