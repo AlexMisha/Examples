@@ -38,6 +38,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 .code
 start:
 
+invoke OutputDebugString, offset sMessage
+
 	invoke GetModuleHandleA, 0
 	mov hInstance, eax
 	.if eax == 0
