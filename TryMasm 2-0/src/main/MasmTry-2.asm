@@ -17,10 +17,12 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	includelib \masm32\lib\user32.lib
 	includelib \masm32\lib\kernel32.lib
 	includelib \masm32\lib\gdi32.lib
+	includelib build\szrev.lib
 
 	PaintMessageHandler PROTO :dword, :dword, :dword, :dword
 	CreateMessageHandler PROTO :dword, :dword, :dword, :dword
 	CommandMessageHandler PROTO :dword, :dword, :dword, :dword
+	szRev PROTO :dword, :dword
 	
 .data
 	lpClassName db 'Class32', 0
@@ -31,7 +33,6 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	Butn4 db 'Enter',0
 	Edit db 'Edit',0
 	sStringForTest db 'Set up your string...',0
-	sGotString db 255
 	
 	hInstance dword 0
 	hButn1 dword 0
@@ -41,6 +42,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	hWindow dword 0
 	hEdit dword 0
 	PaintMessage dword 0
+	hCreateEdit dword 0
+	hEdit2 dword 0
 	
 	wc WNDCLASSA <?>
 	Msg MSG <?>
@@ -189,7 +192,12 @@ ret
 PaintMessageHandler endp
 
 CreateMessageHandler proc hwnd, msg, lParam, wParam
-
+	
+	mov eax, hCreateEdit
+	.if eax == 1
+		jmp CreateEdit
+	.endif
+	
 	PushButton addr Butn1, hwnd, 500, 300, 100, 25
 	mov hButn1, eax
 	.if eax == 0
@@ -242,9 +250,23 @@ CreateMessageHandler proc hwnd, msg, lParam, wParam
 	mov esi, offset hEdit
 	mov edi, offset hEdit_
 	movsd 
-	
 	invoke SendMessage, hEdit, WM_SETTEXT, 0, offset sStringForTest
 	
+CreateEdit:
+	mov eax, hCreateEdit
+	.if eax == 1
+		PushEdit addr Edit, hwnd, 50, 175, 250, 20
+		mov hEdit2, eax
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+		.endif
+		invoke SendMessage, hEdit2, WM_SETTEXT, 0, offset  sReveredString
+		mov hCreateEdit, 0
+	.endif
 ret
 CreateMessageHandler endp
 
