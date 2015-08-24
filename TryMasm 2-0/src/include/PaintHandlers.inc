@@ -1,0 +1,124 @@
+TextOutHandler PROTO :dword, :dword, :dword, :dword
+RectangleHandler PROTO :dword, :dword, :dword, :dword
+
+.data
+	hPaint dword 0
+	hBrush dword 0
+	
+	Paint PAINTSTRUCT <?>
+	
+	sInfoMessageString db 'Left click for message',0
+	sInfoExitString db 'Right click for exit',0
+
+.code
+TextOutHandler proc hwnd, mes, lParam, wParam
+invoke BeginPaint, hwnd, offset Paint
+	mov hPaint, eax
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "BeginPaint error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "BeginPaint success, eax[%08X]", eax
+	.endif
+	invoke SetBkColor, addr hPaint, White	
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "SetBkColor error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "SetBkColor success, eax[%08X]", eax
+	.endif
+
+	invoke SetTextColor, addr hPaint, Black
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "SetTextColor error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "SetTextColor success, eax[%08X]", eax
+	.endif
+	
+	invoke TextOutA, hPaint, 50, 50, offset sInfoExitString, lengthof sInfoExitString
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "TextOutA error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "TextOutA success, eax[%08X]", eax
+	.endif
+	
+	invoke TextOutA, hPaint, 50, 100, offset sInfoMessageString, lengthof sInfoMessageString
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "TextOutA error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "TextOutA success, eax[%08X]", eax
+	.endif
+	
+	invoke EndPaint, hwnd, offset Paint
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "EndPaint error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "EndPaint success, eax[%08X]", eax
+	.endif
+ret
+TextOutHandler endp
+
+RectangleHandler proc hwnd, mes, lParam, wParam
+
+	.if PaintMessage == 1
+		mov PaintMessage, 0
+
+		invoke BeginPaint, hwnd, offset Paint
+		mov hPaint, eax
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "BeginPaint error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "BeginPaint success, eax[%08X]", eax
+		.endif
+		
+		invoke CreateSolidBrush, Blue
+		mov hBrush, eax
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
+		.endif
+		
+		invoke SelectObject, hPaint, hBrush
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "SelectObject error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "SelectObject success, eax[%08X]", eax
+		.endif
+			
+		invoke Rectangle, hPaint, 300, 300, 500, 500
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "Rectangle error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "Rectangle success, eax[%08X]", eax
+		.endif
+			
+		invoke EndPaint, hwnd, offset Paint
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "EndPaint error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "EndPaint success, eax[%08X]", eax
+		.endif
+	.endif
+ret
+RectangleHandler endp 

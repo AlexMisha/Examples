@@ -13,6 +13,7 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\PushMacro.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\ButnHandlers.inc
+	include \masm32\projects\Examples\TryMasm 2-0\src\include\PaintHandlers.inc
 	includelib \masm32\lib\user32.lib
 	includelib \masm32\lib\kernel32.lib
 	includelib \masm32\lib\gdi32.lib
@@ -29,8 +30,6 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	Butn3 db 'Paint',0
 	Butn4 db 'Enter',0
 	Edit db 'Edit',0
-	sInfoExitString db 'Right click for exit',0
-	sInfoMessageString db 'Left click for message',0
 	sStringForTest db 'Set up your string...',0
 	sGotString db 255
 	
@@ -40,13 +39,10 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	hButn3 dword 0
 	hButn4 dword 0
 	hWindow dword 0
-	hBrush dword 0
 	hEdit dword 0
-	hPaint dword 0
 	PaintMessage dword 0
 	
 	wc WNDCLASSA <?>
-	Paint PAINTSTRUCT <?>
 	Msg MSG <?>
 .code
 start:
@@ -185,113 +181,10 @@ MasmTry endp
 
 PaintMessageHandler proc hwnd, mes, lParam, wParam
 
-	invoke BeginPaint, hwnd, offset Paint
-	mov hPaint, eax
-	.if eax == 0
-		invoke GetLastError
-		LOG_ERROR "BeginPaint error code:[%08X]", eax
-		jmp Finish
-	.else
-		LOG_INFO "BeginPaint success, eax[%08X]", eax
-	.endif
-	invoke SetBkColor, addr hPaint, White	
-	.if eax == 0
-		invoke GetLastError
-		LOG_ERROR "SetBkColor error code:[%08X]", eax
-		jmp Finish
-	.else
-		LOG_INFO "SetBkColor success, eax[%08X]", eax
-	.endif
-
-	invoke SetTextColor, addr hPaint, Black
-	.if eax == 0
-		invoke GetLastError
-		LOG_ERROR "SetTextColor error code:[%08X]", eax
-		jmp Finish
-	.else
-		LOG_INFO "SetTextColor success, eax[%08X]", eax
-	.endif
-	
-	invoke TextOutA, hPaint, 50, 50, offset sInfoExitString, lengthof sInfoExitString
-	.if eax == 0
-		invoke GetLastError
-		LOG_ERROR "TextOutA error code:[%08X]", eax
-		jmp Finish
-	.else
-		LOG_INFO "TextOutA success, eax[%08X]", eax
-	.endif
-	
-	invoke TextOutA, hPaint, 50, 100, offset sInfoMessageString, lengthof sInfoMessageString
-	.if eax == 0
-		invoke GetLastError
-		LOG_ERROR "TextOutA error code:[%08X]", eax
-		jmp Finish
-	.else
-		LOG_INFO "TextOutA success, eax[%08X]", eax
-	.endif
-	
-	invoke EndPaint, hwnd, offset Paint
-	.if eax == 0
-		invoke GetLastError
-		LOG_ERROR "EndPaint error code:[%08X]", eax
-		jmp Finish
-	.else
-		LOG_INFO "EndPaint success, eax[%08X]", eax
-	.endif
-	
-	.if PaintMessage == 1
-		mov PaintMessage, 0
-
-		invoke BeginPaint, hwnd, offset Paint
-		mov hPaint, eax
-		.if eax == 0
-			invoke GetLastError
-			LOG_ERROR "BeginPaint error code:[%08X]", eax
-			jmp Finish
-		.else
-			LOG_INFO "BeginPaint success, eax[%08X]", eax
-		.endif
-		
-		invoke CreateSolidBrush, Blue
-		mov hBrush, eax
-		.if eax == 0
-			invoke GetLastError
-			LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
-			jmp Finish
-		.else
-			LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
-		.endif
-		
-		invoke SelectObject, hPaint, hBrush
-		.if eax == 0
-			invoke GetLastError
-			LOG_ERROR "SelectObject error code:[%08X]", eax
-			jmp Finish
-		.else
-			LOG_INFO "SelectObject success, eax[%08X]", eax
-		.endif
-			
-		invoke Rectangle, hPaint, 300, 300, 500, 500
-		.if eax == 0
-			invoke GetLastError
-			LOG_ERROR "Rectangle error code:[%08X]", eax
-			jmp Finish
-		.else
-			LOG_INFO "Rectangle success, eax[%08X]", eax
-		.endif
-			
-		invoke EndPaint, hwnd, offset Paint
-		.if eax == 0
-			invoke GetLastError
-			LOG_ERROR "EndPaint error code:[%08X]", eax
-			jmp Finish
-		.else
-			LOG_INFO "EndPaint success, eax[%08X]", eax
-		.endif
-	.endif
-
+	invoke TextOutHandler, hwnd, mes, lParam, wParam
+	invoke RectangleHandler, hwnd, mes, lParam, wParam
 	mov eax, 0
-
+	
 ret
 PaintMessageHandler endp
 
