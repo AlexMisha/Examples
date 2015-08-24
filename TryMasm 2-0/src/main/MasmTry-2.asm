@@ -12,8 +12,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	include \masm32\macros\macros.asm
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\PushMacro.inc
-	include \masm32\projects\Examples\TryMasm 2-0\src\include\ButnHandlers.inc
-	include \masm32\projects\Examples\TryMasm 2-0\src\include\PaintHandlers.inc
+	include \masm32\projects\Examples\TryMasm 2-0\src\main\ButnHandlers.asm
+	include \masm32\projects\Examples\TryMasm 2-0\src\main\PaintHandlers.asm
 	includelib \masm32\lib\user32.lib
 	includelib \masm32\lib\kernel32.lib
 	includelib \masm32\lib\gdi32.lib
@@ -264,7 +264,7 @@ CreateEdit:
 		.else
 			LOG_INFO "CreateWindowExA success, eax[%08X]", eax
 		.endif
-		invoke SendMessage, hEdit2, WM_SETTEXT, 0, offset  sReveredString
+		invoke SendMessage, hEdit2, WM_SETTEXT, 0, offset sReveredString
 		mov hCreateEdit, 0
 	.endif
 ret
