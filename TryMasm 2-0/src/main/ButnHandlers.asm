@@ -12,7 +12,7 @@ option casemap:none
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\common.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 szRev PROTO :dword, :dword
-
+;
 .data
 	sMessage db 'Message',0 
 	sGotString db 255
