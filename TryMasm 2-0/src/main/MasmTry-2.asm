@@ -10,19 +10,16 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	include \masm32\include\kernel32.inc
 	include \masm32\include\gdi32.inc
 	include \masm32\macros\macros.asm
+	include \masm32\projects\Examples\TryMasm 2-0\src\include\common.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\PushMacro.inc
-	include \masm32\projects\Examples\TryMasm 2-0\src\main\ButnHandlers.asm
-	include \masm32\projects\Examples\TryMasm 2-0\src\main\PaintHandlers.asm
 	includelib \masm32\lib\user32.lib
 	includelib \masm32\lib\kernel32.lib
 	includelib \masm32\lib\gdi32.lib
-	includelib build\szrev.lib
 
 	PaintMessageHandler PROTO :dword, :dword, :dword, :dword
 	CreateMessageHandler PROTO :dword, :dword, :dword, :dword
 	CommandMessageHandler PROTO :dword, :dword, :dword, :dword
-	szRev PROTO :dword, :dword
 	
 .data
 	lpClassName db 'Class32', 0
@@ -33,17 +30,6 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	Butn4 db 'Enter',0
 	Edit db 'Edit',0
 	sStringForTest db 'Set up your string...',0
-	
-	hInstance dword 0
-	hButn1 dword 0
-	hButn2 dword 0
-	hButn3 dword 0
-	hButn4 dword 0
-	hWindow dword 0
-	hEdit dword 0
-	PaintMessage dword 0
-	hCreateEdit dword 0
-	hEdit2 dword 0
 	
 	wc WNDCLASSA <?>
 	Msg MSG <?>
@@ -247,9 +233,6 @@ CreateMessageHandler proc hwnd, msg, lParam, wParam
 	.else
 		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
 	.endif
-	mov esi, offset hEdit
-	mov edi, offset hEdit_
-	movsd 
 	invoke SendMessage, hEdit, WM_SETTEXT, 0, offset sStringForTest
 	
 CreateEdit:
@@ -271,6 +254,7 @@ ret
 CreateMessageHandler endp
 
 CommandMessageHandler proc hwnd, mes, lParam, wParam
+LOG_DEBUG "Some command had got", eax
 	mov eax, hButn1
 	.if wParam == eax
 		invoke Butn1Handler, hwnd, mes, lParam, wParam

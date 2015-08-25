@@ -1,5 +1,16 @@
-TextOutHandler PROTO :dword, :dword, :dword, :dword
-RectangleHandler PROTO :dword, :dword, :dword, :dword
+.686P
+.model flat, stdcall
+option casemap:none
+
+	include \masm32\include\windows.inc
+	include \masm32\include\user32.inc
+	include \masm32\include\kernel32.inc
+	include \masm32\include\gdi32.inc
+	includelib \masm32\lib\user32.lib
+	includelib \masm32\lib\kernel32.lib
+	includelib \masm32\lib\gdi32.lib
+	include \masm32\projects\Examples\TryMasm 2-0\src\include\common.inc
+	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 
 .data
 	hPaint dword 0
@@ -8,7 +19,6 @@ RectangleHandler PROTO :dword, :dword, :dword, :dword
 	Paint PAINTSTRUCT <?>
 	
 	sInfoMessageString db 'Left click for message',0
-	sInfoExitString db 'Right click for exit',0
 
 .code
 TextOutHandler proc hwnd, mes, lParam, wParam
@@ -65,6 +75,7 @@ invoke BeginPaint, hwnd, offset Paint
 	.else
 		LOG_INFO "EndPaint success, eax[%08X]", eax
 	.endif
+Finish:
 ret
 TextOutHandler endp
 
@@ -120,5 +131,8 @@ RectangleHandler proc hwnd, mes, lParam, wParam
 			LOG_INFO "EndPaint success, eax[%08X]", eax
 		.endif
 	.endif
+
+Finish:
 ret
 RectangleHandler endp 
+end

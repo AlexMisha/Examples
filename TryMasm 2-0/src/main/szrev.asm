@@ -1,6 +1,6 @@
 ; ллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
 
-    .486
+    .686
     .model flat, stdcall  ; 32 bit memory model
     option casemap :none  ; case sensitive
 	
@@ -22,7 +22,6 @@ szRev proc src:DWORD,dst:DWORD
   ; accept the same address as both src
   ; and dst.
   ; ------------------------------------
-
     push esi
     push edi
 
