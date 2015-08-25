@@ -19,4 +19,4 @@ RectangleHandler PROTO :dword, :dword, :dword, :dword
 	hEdit2 dword 0
 	
 	sInfoExitString db 'Right click for exit',0
-	sReveredString db 256 dup (?)
+	sReveredString db 255

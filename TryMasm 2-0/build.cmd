@@ -4,9 +4,6 @@ md build
 
 RC /Fo build\rsrc.res src\resource\rsrc.rc || goto ErrLable
 
-ml /c /coff /Fo build\szlen.obj src\main\szlen.asm || goto ErrLable
-lib /subsystem:windows /export:szLen build\szlen.obj
-
 ml /c /coff /D LOG_LEVEL=4 /Fo build\PaintHandlers.obj src\main\PaintHandlers.asm || goto ErrLable
 
 ml /c /coff /D LOG_LEVEL=4 /Fo build\ButnHandlers.obj src\main\ButnHandlers.asm || goto ErrLable
