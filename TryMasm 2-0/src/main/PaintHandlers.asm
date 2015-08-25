@@ -130,7 +130,7 @@ RectangleHandler proc hwnd, mes, lParam, wParam
 		.endif
 		mov PaintMessage, 0
 		
-		invoke UpdateWindow, hWindow
+		invoke UpdateWindow, hwnd
 		.if eax == 0
 			invoke GetLastError
 			LOG_ERROR "UpdateWindow error code:[%08X]", eax
