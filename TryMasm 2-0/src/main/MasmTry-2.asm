@@ -169,9 +169,16 @@ ret
 MasmTry endp
 
 PaintMessageHandler proc hwnd, mes, lParam, wParam
-
+	mov eax, PaintMessage
+	push eax
+	.if wParam == 1
+		jmp Rectangle1
+	.endif
 	invoke TextOutHandler, hwnd, mes, lParam, wParam
-	invoke RectangleHandler, hwnd, mes, lParam, wParam
+Rectangle1:
+	.if wParam == 1
+		invoke RectangleHandler, hwnd, mes, lParam, wParam
+	.endif
 	mov eax, 0
 	
 ret

@@ -37,8 +37,7 @@ ret
 Butn2Handler endp
 
 Butn3Handler proc hwnd, mes, lParam, wParam
-	mov PaintMessage, 1
-	invoke SendMessage, hwnd, WM_PAINT, 0, 0
+	invoke SendMessage, hwnd, WM_PAINT, 0, 1
 ret
 Butn3Handler endp
 
