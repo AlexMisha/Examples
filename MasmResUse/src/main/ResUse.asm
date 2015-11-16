@@ -26,6 +26,8 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	Msg MSG <?>
 	lpBuf db 40 dup(0)
 	lpBuf2 db 40 dup(0)
+	lpExitString db 'End of programm', 0
+	Menu db "MENUP",0
 .code
 start:
 
@@ -68,7 +70,7 @@ jmp Finish
 LOG_INFO "LoadCursorA success, eax[%08X]", eax
 .endif
 
-invoke CreateSolidBrush, COLOR_DESKTOP
+invoke CreateSolidBrush, White
 mov [wc.hbrBackground], eax
 
 .if eax == 0
@@ -79,7 +81,7 @@ jmp Finish
 LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
 .endif
 
-mov dword ptr [wc.lpszMenuName], 0
+mov dword ptr [wc.lpszMenuName], offset Menu
 mov dword ptr [wc.lpszClassName], offset lpClassName
 
 invoke RegisterClassA, offset wc
@@ -149,6 +151,19 @@ MasmTry proc hwnd:dword, mes:dword, lParam:dword, wParam:dword
 .elseif mes == WM_DESTROY
 	invoke PostQuitMessage, 0
 	mov eax, 0
+
+.elseif mes == WM_COMMAND
+	.if lParam == 5
+		invoke MessageBoxA, hwnd, offset lpExitString, 0, 0
+		.if eax == 0
+			invoke GetLastError
+			LOG_ERROR "MessageBoxA error code:[%08X]", eax
+			jmp Finish
+		.else
+			LOG_INFO "MessageBoxA success, eax[%08X]", eax
+		.endif
+		invoke PostQuitMessage, 0
+	.endif
 .else
 	invoke DefWindowProcA, hwnd, mes, lParam, wParam
 .endif

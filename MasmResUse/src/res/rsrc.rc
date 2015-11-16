@@ -11,3 +11,24 @@ CAPTION "Example"
 FONT 8, "Arial"
 {
 }
+
+MENUP MENU
+{
+POPUP "&File"
+{
+MENUITEM "&One",1
+MENUITEM "&Two",2
+}
+POPUP "&Change"
+{
+MENUITEM "&One",3
+MENUITEM "&Two",4
+
+POPUP "&Another"
+{
+
+MENUITEM "&One", 6
+}
+}
+MENUITEM "Exit", 5
+}

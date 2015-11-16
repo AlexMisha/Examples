@@ -13,7 +13,6 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\common.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\PushMacro.inc
-	include \masm32\projects\Examples\TryMasm 2-0\src\include\Butn4Handler.asm
 	includelib \masm32\lib\user32.lib
 	includelib \masm32\lib\kernel32.lib
 	includelib \masm32\lib\gdi32.lib
@@ -23,7 +22,7 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	CommandMessageHandler PROTO :dword, :dword, :dword, :dword
 	
 .data
-	lpClassName db 'Class32', 0
+	lpClassName db 'Window', 0
 	lpWindowName db 'MasmTry-2', 0
 	Butn1 db 'Exit', 0
 	Butn2 db 'Message', 0
@@ -284,11 +283,6 @@ CommandMessageHandler proc hwnd, mes, lParam, wParam
 	mov eax, hButn3
 	.if wParam == eax
 		invoke Butn3Handler, hwnd, mes, lParam, wParam
-	.endif
-	xor eax,eax
-	mov eax, hButn4
-	.if wParam == eax
-		invoke Butn4Handler, hwnd, mes, lParam, wParam
 	.endif
 ret
 
