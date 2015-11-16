@@ -17,6 +17,8 @@ RectangleHandler PROTO :dword, :dword, :dword, :dword
 	hWindow dword 0
 	hEdit dword 0
 	hEdit2 dword 0
+	hBrush dword 0
 	
 	sInfoExitString db 'Right click for exit',0
-	sReveredString db 255
+	sReveredString db 256 dup (0)
+	sGotString db 255

@@ -13,6 +13,7 @@ Style equ CS_HREDRAW + CS_VREDRAW + CS_GLOBALCLASS
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\common.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\PushMacro.inc
+	include \masm32\projects\Examples\TryMasm 2-0\src\include\Butn4Handler.asm
 	includelib \masm32\lib\user32.lib
 	includelib \masm32\lib\kernel32.lib
 	includelib \masm32\lib\gdi32.lib
@@ -75,6 +76,16 @@ start:
 
 	invoke CreateSolidBrush, White
 	mov [wc.hbrBackground], eax
+	.if eax == 0
+		invoke GetLastError
+		LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
+		jmp Finish
+	.else
+		LOG_INFO "CreateSolidBrush success, eax[%08X]", eax
+	.endif
+	
+	invoke CreateSolidBrush, Blue
+	mov hBrush, eax
 	.if eax == 0
 		invoke GetLastError
 		LOG_ERROR "CreateSolidBrush error code:[%08X]", eax
@@ -186,8 +197,7 @@ PaintMessageHandler endp
 
 CreateMessageHandler proc hwnd, msg, lParam, wParam
 	
-	mov eax, hCreateEdit
-	.if eax == 1
+	.if wParam == 1
 		jmp CreateEdit
 	.endif
 	
@@ -195,73 +205,72 @@ CreateMessageHandler proc hwnd, msg, lParam, wParam
 	mov hButn1, eax
 	.if eax == 0
 		invoke GetLastError
-		LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+		LOG_ERROR "ExitButton error code:[%08X]", eax
 		jmp Finish
 	.else
-		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+		LOG_INFO "ExitButton success, eax[%08X]", eax
 	.endif
 
 	PushButton addr Butn2, hwnd, 500, 50, 100, 25
 	mov hButn2, eax
 	.if eax == 0
 		invoke GetLastError
-		LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+		LOG_ERROR "MesButton error code:[%08X]", eax
 		jmp Finish
 	.else
-		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+		LOG_INFO "MesButton success, eax[%08X]", eax
 	.endif
 	
 	PushButton addr Butn3, hwnd, 500, 100, 100, 25
 	mov hButn3, eax
 	.if eax == 0
 		invoke GetLastError
-		LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+		LOG_ERROR "PaintButton error code:[%08X]", eax
 		jmp Finish
 	.else
-		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+		LOG_INFO "PaintButton success, eax[%08X]", eax
 	.endif
 	
 	PushButton addr Butn4, hwnd, 305, 150, 50, 20
 	mov hButn4, eax
 	.if eax == 0
 		invoke GetLastError
-		LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+		LOG_ERROR "EnterButton error code:[%08X]", eax
 		jmp Finish
 	.else
-		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+		LOG_INFO "EnterButton success, eax[%08X]", eax
 	.endif
 	
 	PushEdit addr Edit, hwnd, 50, 150, 250, 20
 	mov hEdit, eax
 	.if eax == 0
 		invoke GetLastError
-		LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+		LOG_ERROR "EditWindow error code:[%08X]", eax
 		jmp Finish
 	.else
-		LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+		LOG_INFO "EditWindow success, eax[%08X]", eax
 	.endif
 	invoke SendMessage, hEdit, WM_SETTEXT, 0, offset sStringForTest
 	
 CreateEdit:
-	mov eax, hCreateEdit
-	.if eax == 1
+	.if wParam == 1
 		PushEdit addr Edit, hwnd, 50, 175, 250, 20
 		mov hEdit2, eax
 		.if eax == 0
 			invoke GetLastError
-			LOG_ERROR "CreateWindowExA error code:[%08X]", eax
+			LOG_ERROR "EditWindow2 error code:[%08X]", eax
 			jmp Finish
 		.else
-			LOG_INFO "CreateWindowExA success, eax[%08X]", eax
+			LOG_INFO "EditWindow2 success, eax[%08X]", eax
 		.endif
-		invoke SendMessage, hEdit2, WM_SETTEXT, 0, offset sReveredString
+LOG_DEBUG "sGotString[%s]", addr sGotString
+		invoke SendMessage, hEdit2, WM_SETTEXT, 0, offset sGotString
 		mov hCreateEdit, 0
 	.endif
 ret
 CreateMessageHandler endp
 
 CommandMessageHandler proc hwnd, mes, lParam, wParam
-LOG_DEBUG "Some command had got", eax
 	mov eax, hButn1
 	.if wParam == eax
 		invoke Butn1Handler, hwnd, mes, lParam, wParam

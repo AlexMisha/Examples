@@ -11,11 +11,10 @@ option casemap:none
 	includelib build\szrev.lib
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\common.inc
 	include \masm32\projects\Examples\TryMasm 2-0\src\include\Log.inc
-szRev PROTO :dword, :dword
-;
+;	includelib build\RevStr.lib
+RevStr PROTO :dword, :dword, :dword
 .data
 	sMessage db 'Message',0 
-	sGotString db 255
 
 .code
 Butn1Handler proc hwnd, mes, lParam, wParam
@@ -41,19 +40,43 @@ Butn3Handler proc hwnd, mes, lParam, wParam
 ret
 Butn3Handler endp
 
-Butn4Handler proc hwnd, mes, lParam, wParam
-	invoke SendMessage, hEdit, WM_GETTEXT, 150, offset sGotString
-	invoke szRev, offset sGotString, addr sReveredString
-	mov ebx, offset sReveredString
-	.if eax == ebx
-		LOG_INFO "szRev success[%08X]", eax
-	.else 
-		invoke GetLastError
-		LOG_ERROR "szRev error code:[%08X]", eax
+RevStr proc lpSrcString:dword, lpResBuf:dword, _Size:dword
+	.if lpSrcString == 0
+		mov eax, 0
+		jmp Finish
+	.elseif lpResBuf == 0
+		mov eax, 0
+		jmp Finish
+	.elseif _Size == 0
+		mov eax, 0
+		jmp Finish
+	.elseif _Size > 256
+		mov eax, 0
+		jmp Finish
 	.endif
-	mov hCreateEdit, 1
-	invoke SendMessage, hwnd, WM_CREATE, 0, 0
+	mov ecx, _Size
+	mov esi, lpSrcString
+	mov edi, lpResBuf
+	add edi, ecx
+	mov byte ptr [edi], 0
+	dec edi
+	xor eax, eax
+InverCicle:
+	.if ecx == 0
+		jmp EndCicle
+	.else
+		mov al, byte ptr [esi]
+		mov byte ptr [edi], al
+		inc esi
+		dec edi
+		dec ecx
+		xor eax, eax
+		jmp InverCicle
+	.endif
+EndCicle:
+
+	mov eax, 1
 Finish:
 ret
-Butn4Handler endp
+RevStr endp
 end

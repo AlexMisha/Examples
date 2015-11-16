@@ -1,0 +1,1 @@
+Butn4Handler proc hwnd, mes, lParam, wParam	invoke SendMessage, hEdit, WM_GETTEXT, 150, offset sGotString	mov hCreateEdit, 1	invoke SendMessage, hwnd, WM_CREATE, 0, 1Butn4Handler endp
