@@ -12,18 +12,19 @@ includelib \masm32\lib\user32.lib
 includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\gdi32.lib
 
-dwCallAddr PROTO :dword, :dword, :dword
-
 .data
+	Libr db 'InvStr.dll',0
+	lpProcName db '_InvStr@12',0
+	lpBuf db 100 dup(0)
+	lpOutString db 'Input:',13,10,0
+	lpBuf2 db 100 dup(0)
+	
 	dwStdInHandle dword 0
 	dwStdOutHandle dword 0
-	Libr db 'InvStr.dll',0
 	hLib dword 0
-	lpProcName db '_InvStr@12',0
 	dwCallAddr dword 0
 	dwSize dword 0
-	lpBuf db 100
-	lpBuf2 db 100
+	dwTmp dword 0
 .code
 start:
 invoke GetStdHandle, STD_INPUT_HANDLE
@@ -44,6 +45,15 @@ mov dwStdOutHandle, eax
 	jmp Finish
 .else
 	LOG_INFO "GetStdHandle success, eax[%08X]", eax
+.endif
+
+invoke WriteConsoleA, dwStdOutHandle, addr lpOutString, lengthof lpOutString, addr dwTmp, 0
+.if eax == 0
+	invoke GetLastError
+	LOG_ERROR "WriteConsoleA error code:[%08X]", eax
+	jmp Finish
+.else
+	LOG_INFO "WriteConsoleA success, eax[%08X]", eax
 .endif
 
 invoke ReadConsoleA, dwStdInHandle, addr lpBuf, 100, addr dwSize, 0
@@ -75,8 +85,14 @@ mov dwCallAddr, eax
 	LOG_INFO "GetProcAddress success, eax[%08X]", eax
 .endif
 
-invoke dwCallAddr, addr lpBuf, addr lpBuf2, dwSize
-.if eax < 1
+mov eax, dwCallAddr
+mov ecx, dwSize
+sub ecx, 2
+push ecx
+push offset lpBuf2
+push offset lpBuf
+call eax
+.if eax == 0
 	invoke GetLastError
 	LOG_ERROR "InvStr error code:[%08X]", eax
 	jmp Finish
@@ -93,7 +109,9 @@ invoke FreeLibrary, hLib
 	LOG_INFO "FreeLibrary success, eax[%08X]", eax
 .endif
 
-invoke WriteConsoleA, dwStdOutHandle, addr lpBuf2, lengthof lpBuf2, addr lpBuf2, 0
+mov ecx, dwSize
+sub ecx, 2
+invoke WriteConsoleA, dwStdOutHandle, addr lpBuf2, ecx, addr dwTmp, 0
 .if eax == 0
 	invoke GetLastError
 	LOG_ERROR "WriteConsoleA error code:[%08X]", eax

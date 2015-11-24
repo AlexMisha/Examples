@@ -7,6 +7,7 @@ option casemap:none
 	include \masm32\include\windows.inc
 	include \masm32\include\user32.inc
 	include \masm32\include\kernel32.inc
+	include \masm32\projects\Examples\DllTest\src\include\Log.inc
 	includelib c:\masm32\lib\user32.lib
 	includelib c:\masm32\lib\kernel32.lib
 .data
@@ -23,18 +24,21 @@ mov eax, 1
 ret 12
 
 InvStr proc EXPORT lpSrcString:dword, lpResBuf:dword, _Size:dword
+;LOG_DEBUG "lpSrcString:%s", lpSrcString
+;LOG_DEBUG "lpResBuf:%s", lpResBuf
+;LOG_DEBUG "_Size:%s", _Size
 	.if lpSrcString == 0
 		mov eax, 0
-		jmp Finish
+		jmp Err
 	.elseif lpResBuf == 0
 		mov eax, 0
-		jmp Finish
+		jmp Err
 	.elseif _Size == 0
 		mov eax, 0
-		jmp Finish
+		jmp Err
 	.elseif _Size > 256
 		mov eax, 0
-		jmp Finish
+		jmp Err
 	.endif
 	mov ecx, _Size
 	mov esi, lpSrcString
@@ -58,6 +62,9 @@ InverCicle:
 EndCicle:
 
 	mov eax, 1
+	jmp Finish
+Err:
+	mov eax, 0
 Finish:
 ret
 InvStr endp
